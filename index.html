@@ -1,0 +1,2051 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Carousel Studio Pro — مولّد كاروسيل ذكي</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@200;300;400;500;700;800;900&family=Cairo:wght@300;400;600;700;900;1000&family=Almarai:wght@300;400;700;800&family=Space+Grotesk:wght@300;400;500;600;700&family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&family=Noto+Kufi+Arabic:wght@400;500;600;700;900&family=El+Messiri:wght@400;500;600;700&family=Changa:wght@400;500;600;700;800&family=Reem+Kufi:wght@400;500;600;700&family=Markazi+Text:wght@400;500;600;700&family=Lalezar&family=Amiri:wght@400;700&family=Mada:wght@400;500;600;700&family=Jomhuria&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<style>
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   DESIGN TOKENS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+:root {
+  --bg:        #080910;
+  --surface:   #0e0f15;
+  --surface2:  #13141c;
+  --border:    #1c1e2a;
+  --border2:   #252838;
+  --text:      #e2e4ef;
+  --muted:     #4a4d62;
+  --muted2:    #6b6f8a;
+  --accent:    #6c63ff;
+  --accent2:   #a78bfa;
+  --green:     #c6f135;
+  --r:         8px;
+  --r2:        12px;
+  --font-ui:   'Space Grotesk', 'Tajawal', sans-serif;
+  --font-ar:   'Tajawal', 'Cairo', 'Almarai', sans-serif;
+  --transition: .18s cubic-bezier(.4,0,.2,1);
+}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   RESET
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);font-family:var(--font-ui)}
+button{cursor:pointer;font-family:inherit;border:none;background:none}
+input,textarea,select{font-family:inherit}
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:99px}
+::-webkit-scrollbar-thumb:hover{background:var(--muted)}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   LAYOUT
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+.app{display:grid;grid-template-rows:52px 1fr;height:100vh;overflow:hidden}
+.app-main{display:grid;grid-template-columns:300px 1fr 300px;overflow:hidden}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   TOPBAR
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+.topbar{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 20px;
+  background:var(--surface);
+  border-bottom:1px solid var(--border);
+  gap:16px;
+}
+.topbar-logo{
+  display:flex;align-items:center;gap:8px;
+  font-size:15px;font-weight:700;letter-spacing:-.3px;color:var(--text);
+  flex-shrink:0;
+}
+.logo-icon{
+  width:26px;height:26px;border-radius:6px;
+  background:linear-gradient(135deg,var(--accent) 0%,var(--accent2) 100%);
+  display:flex;align-items:center;justify-content:center;
+  font-size:13px;color:#fff;font-weight:900;
+}
+.topbar-badge{
+  font-size:10px;font-weight:600;letter-spacing:1px;
+  padding:2px 7px;border-radius:99px;
+  background:rgba(108,99,255,.15);color:var(--accent2);
+  border:1px solid rgba(108,99,255,.3);
+  text-transform:uppercase;
+}
+.topbar-center{display:flex;align-items:center;gap:6px}
+.topbar-pills{display:flex;align-items:center;gap:4px;flex-wrap:wrap}
+.t-pill{
+  font-size:11px;font-weight:600;
+  padding:3px 10px;border-radius:99px;
+  border:1px solid var(--border2);
+  color:var(--muted2);
+  transition:var(--transition);
+}
+.t-pill:hover{border-color:var(--border2);color:var(--text)}
+.t-pill.active{background:var(--border);color:var(--text);border-color:var(--border2)}
+.topbar-actions{display:flex;align-items:center;gap:8px;flex-shrink:0}
+.topbar-btn{
+  display:flex;align-items:center;gap:6px;
+  font-size:12px;font-weight:600;
+  padding:6px 12px;border-radius:6px;
+  border:1px solid var(--border2);
+  color:var(--muted2);
+  transition:var(--transition);
+}
+.topbar-btn:hover{color:var(--text);border-color:var(--muted)}
+.topbar-btn.primary{
+  background:var(--accent);color:#fff;border-color:var(--accent);
+}
+.topbar-btn.primary:hover{background:#7c74ff}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   SIDEBAR SHARED
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+.sidebar{
+  background:var(--surface);
+  border:1px solid var(--border);
+  overflow-y:auto;
+  display:flex;flex-direction:column;
+}
+.sidebar-left{border-right:1px solid var(--border);border-left:none;border-top:none;border-bottom:none}
+.sidebar-right{border-left:1px solid var(--border);border-right:none;border-top:none;border-bottom:none}
+
+.sidebar-section{
+  padding:16px 16px 0;
+}
+.sidebar-section+.sidebar-section{border-top:1px solid var(--border);padding-top:16px}
+.sidebar-section:last-child{padding-bottom:16px}
+
+.sec-title{
+  font-size:10px;font-weight:700;letter-spacing:1.5px;
+  text-transform:uppercase;color:var(--muted);
+  margin-bottom:12px;display:flex;align-items:center;gap:6px;
+}
+.sec-title svg{opacity:.7}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   FORM CONTROLS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+.field{display:flex;flex-direction:column;gap:5px;margin-bottom:10px}
+.field:last-child{margin-bottom:0}
+.field label{font-size:11px;font-weight:600;color:var(--muted2);letter-spacing:.3px}
+.field input,.field textarea,.field select{
+  background:var(--bg);border:1px solid var(--border2);
+  border-radius:var(--r);padding:8px 10px;
+  color:var(--text);font-size:13px;
+  direction:rtl;transition:border-color var(--transition);
+  width:100%;
+}
+.field input:focus,.field textarea:focus,.field select:focus{
+  outline:none;border-color:var(--accent);
+}
+.field input::placeholder,.field textarea::placeholder{color:var(--muted)}
+.field textarea{min-height:72px;resize:vertical;line-height:1.6}
+.field select{
+  appearance:none;cursor:pointer;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath fill='%236b6f8a' d='M5 6L0 0h10z'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:left 10px center;
+}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+
+/* SLIDER */
+.slider-field{margin-bottom:10px}
+.slider-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+.slider-header label{font-size:11px;font-weight:600;color:var(--muted2)}
+.slider-val{
+  font-size:12px;font-weight:700;color:var(--accent2);
+  background:rgba(108,99,255,.1);padding:1px 7px;border-radius:4px;
+}
+input[type=range]{
+  -webkit-appearance:none;appearance:none;
+  width:100%;height:3px;
+  background:var(--border2);border-radius:99px;
+  outline:none;cursor:pointer;
+}
+input[type=range]::-webkit-slider-thumb{
+  -webkit-appearance:none;appearance:none;
+  width:14px;height:14px;border-radius:50%;
+  background:var(--accent);border:2px solid var(--bg);
+  transition:transform var(--transition);
+}
+input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.2)}
+
+/* TOGGLE */
+.toggle-row{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:6px 0;margin-bottom:4px;
+}
+.toggle-row label{font-size:12px;font-weight:500;color:var(--muted2);cursor:pointer}
+.toggle{
+  position:relative;width:32px;height:18px;flex-shrink:0;cursor:pointer;
+}
+.toggle input{opacity:0;width:0;height:0;position:absolute}
+.toggle-track{
+  position:absolute;inset:0;
+  background:var(--border2);border-radius:99px;
+  transition:background var(--transition);
+}
+.toggle input:checked~.toggle-track{background:var(--accent)}
+.toggle-thumb{
+  position:absolute;top:2px;right:2px;
+  width:14px;height:14px;border-radius:50%;
+  background:#fff;
+  transition:right var(--transition);
+}
+.toggle input:checked~.toggle-thumb{right:16px}
+
+/* COUNTER */
+.counter-row{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.counter-row label{font-size:11px;font-weight:600;color:var(--muted2);flex:1}
+.counter-ctrl{display:flex;align-items:center;gap:0}
+.counter-btn{
+  width:26px;height:26px;border-radius:4px;
+  background:var(--bg);border:1px solid var(--border2);
+  color:var(--text);font-size:16px;
+  display:flex;align-items:center;justify-content:center;
+  transition:var(--transition);
+}
+.counter-btn:hover{border-color:var(--accent);color:var(--accent)}
+.counter-num{
+  min-width:32px;height:26px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:13px;font-weight:700;color:var(--accent2);
+  background:var(--bg);border-top:1px solid var(--border2);
+  border-bottom:1px solid var(--border2);
+}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   SIZE PICKER
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+.size-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:8px}
+.size-card{
+  border:1px solid var(--border2);border-radius:var(--r);
+  padding:8px 4px;text-align:center;cursor:pointer;
+  transition:var(--transition);position:relative;overflow:hidden;
+}
+.size-card:hover{border-color:var(--muted)}
+.size-card.active{border-color:var(--accent);background:rgba(108,99,255,.08)}
+.size-card.active::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:var(--accent);
+}
+.size-visual{
+  margin:0 auto 5px;border:1px solid currentColor;
+  opacity:.5;
+}
+.size-card.active .size-visual{opacity:1;border-color:var(--accent)}
+.size-card span{font-size:9px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--muted2);display:block}
+.size-card.active span{color:var(--accent2)}
+.size-card small{font-size:8px;color:var(--muted);display:block;margin-top:1px}
+
+/* ORIENTATION TOGGLE */
+.orient-row{display:flex;gap:6px;margin-bottom:8px}
+.orient-btn{
+  flex:1;padding:7px;border-radius:var(--r);
+  border:1px solid var(--border2);font-size:11px;font-weight:600;
+  color:var(--muted2);display:flex;flex-direction:column;align-items:center;gap:4px;
+  transition:var(--transition);
+}
+.orient-btn:hover{border-color:var(--muted);color:var(--text)}
+.orient-btn.active{border-color:var(--accent);color:var(--accent2);background:rgba(108,99,255,.07)}
+.orient-icon{
+  border:1.5px solid currentColor;border-radius:2px;opacity:.7;
+}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   STYLE PICKER (RIGHT SIDEBAR)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+.style-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.style-card{
+  border:1px solid var(--border2);border-radius:var(--r2);
+  padding:0;cursor:pointer;overflow:hidden;
+  transition:var(--transition);position:relative;
+}
+.style-card:hover{border-color:var(--muted);transform:translateY(-1px)}
+.style-card.active{border-color:var(--accent);box-shadow:0 0 0 2px rgba(108,99,255,.3)}
+.style-preview{
+  height:72px;width:100%;position:relative;overflow:hidden;
+  display:flex;align-items:center;justify-content:center;
+}
+.style-info{padding:6px 8px 7px}
+.style-name{font-size:11px;font-weight:700;color:var(--text);margin-bottom:1px}
+.style-desc{font-size:9px;color:var(--muted2);line-height:1.4}
+.style-check{
+  position:absolute;top:5px;left:5px;
+  width:16px;height:16px;border-radius:50%;
+  background:var(--accent);
+  display:none;align-items:center;justify-content:center;
+  font-size:8px;color:#fff;
+}
+.style-card.active .style-check{display:flex}
+
+/* Style preview swatches */
+.sp-tech{background:linear-gradient(135deg,#f5f5f5 0%,#eaeaea 100%)}
+.sp-dark{background:linear-gradient(135deg,#080808 0%,#100c1c 100%)}
+.sp-modern{background:linear-gradient(135deg,#f7f2ea 0%,#ede5d8 100%)}
+.sp-brutalist{background:linear-gradient(135deg,#fff 0%,#f0f0f0 100%)}
+.sp-glass{background:linear-gradient(135deg,#0f172a 0%,#1e1b4b 100%)}
+.sp-gradient{background:linear-gradient(135deg,#1a0533 0%,#0d1545 40%,#1a0533 100%)}
+
+/* Accent dots for style previews */
+.sp-line{position:absolute;left:8px;right:8px;height:2px;border-radius:1px;bottom:12px}
+.sp-circle{position:absolute;width:22px;height:22px;border-radius:50%;top:10px;right:10px}
+.sp-title{position:absolute;font-family:'Cairo',sans-serif;font-weight:900;font-size:13px;right:8px;top:8px}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   CANVAS AREA
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+.canvas-area{
+  background:var(--bg);
+  display:flex;flex-direction:column;
+  overflow:hidden;
+  position:relative;
+}
+.canvas-toolbar{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:10px 16px;
+  border-bottom:1px solid var(--border);
+  background:var(--surface);
+  flex-shrink:0;
+}
+.canvas-toolbar-left{display:flex;align-items:center;gap:8px}
+.canvas-info{
+  font-size:11px;color:var(--muted2);font-weight:500;
+  display:flex;align-items:center;gap:6px;
+}
+.canvas-info strong{color:var(--text);font-weight:700}
+.dim-badge{
+  font-size:10px;font-weight:700;letter-spacing:.5px;
+  padding:2px 8px;border-radius:4px;
+  background:var(--surface2);border:1px solid var(--border2);
+  color:var(--muted2);font-family:var(--font-ui);
+}
+.view-btns{display:flex;align-items:center;gap:2px}
+.view-btn{
+  width:28px;height:28px;border-radius:5px;
+  border:1px solid var(--border2);
+  color:var(--muted);display:flex;align-items:center;justify-content:center;
+  transition:var(--transition);font-size:13px;
+}
+.view-btn:hover,.view-btn.active{border-color:var(--border2);background:var(--border2);color:var(--text)}
+
+.canvas-scroll{
+  flex:1;overflow-y:auto;overflow-x:hidden;
+  padding:24px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:20px;
+}
+
+/* Grid vs Single view */
+.slides-container{
+  display:grid;gap:20px;width:100%;
+  justify-items:center;
+}
+.slides-container.grid-2{grid-template-columns:repeat(2,1fr)}
+.slides-container.grid-3{grid-template-columns:repeat(3,1fr)}
+.slides-container.single{grid-template-columns:1fr;max-width:600px}
+
+/* Empty state */
+.empty-state{
+  flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:20px;text-align:center;color:var(--muted);
+  padding:40px;
+}
+.empty-icon{
+  width:80px;height:80px;border-radius:20px;
+  border:1.5px dashed var(--border2);
+  display:flex;align-items:center;justify-content:center;
+  font-size:28px;color:var(--border2);
+}
+.empty-title{font-size:15px;font-weight:700;color:var(--muted2)}
+.empty-text{font-size:13px;color:var(--muted);line-height:1.6;max-width:260px}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   SLIDE WRAPPER (responsive frame)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+.slide-frame{
+  position:relative;width:100%;
+  border-radius:var(--r2);overflow:hidden;
+  box-shadow:0 4px 24px rgba(0,0,0,.6),0 0 0 1px rgba(255,255,255,.04);
+  cursor:zoom-in;
+  transition:box-shadow var(--transition),transform var(--transition);
+}
+.slide-frame:hover{
+  box-shadow:0 8px 40px rgba(0,0,0,.8),0 0 0 1px rgba(108,99,255,.3);
+  transform:translateY(-2px);
+}
+.slide-frame-inner{
+  position:absolute;top:0;left:0;
+  transform-origin:top left;
+}
+
+/* Slide number badge on hover */
+.slide-frame .frame-num{
+  position:absolute;bottom:8px;right:8px;
+  font-size:10px;font-weight:700;
+  background:rgba(0,0,0,.7);color:#fff;
+  padding:2px 8px;border-radius:4px;
+  opacity:0;transition:opacity var(--transition);
+  z-index:10;pointer-events:none;
+  font-family:var(--font-ui);
+}
+.slide-frame:hover .frame-num{opacity:1}
+
+/* Frame action buttons (edit text / change icon) */
+.frame-actions{
+  position:absolute;top:8px;left:8px;display:flex;gap:6px;
+  opacity:0;transition:opacity var(--transition);z-index:10;
+}
+.slide-frame:hover .frame-actions{opacity:1}
+.frame-action-btn{
+  width:30px;height:30px;border-radius:50%;
+  background:rgba(0,0,0,.7);color:#fff;
+  display:flex;align-items:center;justify-content:center;
+  font-size:14px;backdrop-filter:blur(4px);
+  border:1px solid rgba(255,255,255,.18);
+  transition:var(--transition);
+}
+.frame-action-btn:hover{background:var(--accent);transform:scale(1.08)}
+
+/* Edit / Icon panels (modals) */
+.side-panel{
+  background:var(--surface);border:1px solid var(--border2);
+  border-radius:var(--r2);padding:22px;width:380px;max-width:90vw;
+  max-height:84vh;overflow-y:auto;text-align:right;direction:rtl;
+}
+.side-panel h3{font-size:14px;font-weight:700;margin-bottom:16px;color:var(--text)}
+.icon-group{margin-bottom:16px}
+.icon-group-title{font-size:11px;font-weight:700;color:var(--muted2);margin-bottom:8px}
+.icon-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:6px}
+.icon-opt{
+  width:100%;aspect-ratio:1;border-radius:var(--r);
+  background:var(--bg);border:1px solid var(--border2);
+  font-size:18px;display:flex;align-items:center;justify-content:center;
+  transition:var(--transition);
+}
+.icon-opt:hover{border-color:var(--accent);background:rgba(108,99,255,.12);transform:scale(1.08)}
+
+/* Image picker tabs */
+.img-tabs{display:flex;gap:4px;margin-bottom:14px;border-bottom:1px solid var(--border);padding-bottom:10px}
+.img-tab{flex:1;font-size:11px;font-weight:600;padding:7px 4px;border-radius:6px;color:var(--muted2);transition:var(--transition)}
+.img-tab:hover{color:var(--text)}
+.img-tab.active{background:var(--border);color:var(--text)}
+.flat-icon-grid{grid-template-columns:repeat(4,1fr)!important}
+.flat-icon-opt{padding:5px!important}
+.flat-icon-opt svg{width:100%;height:100%;display:block}
+#imgUploadInput{font-size:11px;color:var(--muted2)}
+.img-note{font-size:10px;color:var(--muted);line-height:1.7;margin-top:6px}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   BUTTONS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+.btn{
+  display:flex;align-items:center;justify-content:center;gap:7px;
+  font-size:13px;font-weight:700;
+  padding:9px 14px;border-radius:var(--r);
+  transition:var(--transition);width:100%;
+  letter-spacing:.1px;
+}
+.btn-primary{
+  background:linear-gradient(135deg,var(--accent) 0%,#8b5cf6 100%);
+  color:#fff;border:none;
+  box-shadow:0 4px 16px rgba(108,99,255,.3);
+}
+.btn-primary:hover:not(:disabled){
+  box-shadow:0 6px 20px rgba(108,99,255,.5);
+  transform:translateY(-1px);
+}
+.btn-primary:disabled{opacity:.4;cursor:not-allowed;transform:none}
+.btn-outline{
+  background:transparent;color:var(--accent2);
+  border:1px solid rgba(108,99,255,.4);
+}
+.btn-outline:hover:not(:disabled){background:rgba(108,99,255,.08);border-color:var(--accent)}
+.btn-outline:disabled{opacity:.3;cursor:not-allowed}
+.btn-ghost{
+  background:transparent;color:var(--muted2);
+  border:1px solid var(--border2);
+}
+.btn-ghost:hover:not(:disabled){color:var(--text);border-color:var(--muted)}
+.btn-ghost:disabled{opacity:.3;cursor:not-allowed}
+
+.btn-sm{padding:6px 10px;font-size:11px}
+.btn-xs{padding:4px 8px;font-size:10px}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   PROGRESS & STATUS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+.progress-track{
+  height:2px;background:var(--border2);border-radius:99px;
+  overflow:hidden;margin:8px 0 6px;
+  opacity:0;transition:opacity .3s;
+}
+.progress-track.show{opacity:1}
+.progress-fill{
+  height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));
+  border-radius:99px;width:0%;
+  transition:width .5s cubic-bezier(.4,0,.2,1);
+}
+.status-msg{
+  font-size:11px;text-align:center;min-height:16px;
+  color:var(--muted);padding:2px 0 6px;
+  display:flex;align-items:center;justify-content:center;gap:5px;
+}
+.status-msg.ok{color:#4ade80}
+.status-msg.err{color:#f87171}
+.status-msg.busy{color:var(--accent2)}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   MODAL (fullscreen preview)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+.modal{
+  position:fixed;inset:0;
+  background:rgba(0,0,0,.94);backdrop-filter:blur(12px);
+  z-index:9999;display:flex;align-items:center;justify-content:center;
+  padding:20px;
+  opacity:0;pointer-events:none;transition:opacity .25s;
+}
+.modal.open{opacity:1;pointer-events:auto}
+.modal-frame{
+  position:relative;
+  box-shadow:0 32px 80px rgba(0,0,0,.9);
+  border-radius:var(--r2);overflow:hidden;
+}
+.modal-close{
+  position:fixed;top:16px;left:16px;
+  width:36px;height:36px;border-radius:50%;
+  background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);
+  color:#fff;font-size:16px;
+  display:flex;align-items:center;justify-content:center;
+  z-index:10;transition:var(--transition);
+}
+.modal-close:hover{background:rgba(255,255,255,.15)}
+.modal-nav{
+  position:fixed;top:50%;transform:translateY(-50%);
+  width:44px;height:44px;border-radius:50%;
+  background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);
+  color:#fff;font-size:20px;
+  display:flex;align-items:center;justify-content:center;
+  transition:var(--transition);z-index:10;
+}
+.modal-nav:hover{background:rgba(255,255,255,.12)}
+.modal-nav.prev{left:16px}
+.modal-nav.next{right:16px}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   SPINNER
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes pulse{0%,100%{opacity:.5}50%{opacity:1}}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@keyframes shimmer{0%{background-position:-400px 0}100%{background-position:400px 0}}
+
+.spinner{
+  width:16px;height:16px;
+  border:2px solid rgba(108,99,255,.2);
+  border-top-color:var(--accent);
+  border-radius:50%;
+  animation:spin .6s linear infinite;
+  flex-shrink:0;
+}
+
+.skeleton{
+  border-radius:var(--r2);
+  background:var(--surface);
+  position:relative;overflow:hidden;
+}
+.skeleton::after{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(90deg,transparent 0%,rgba(255,255,255,.025) 50%,transparent 100%);
+  background-size:400px 100%;
+  animation:shimmer 2s infinite;
+}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   SLIDE ANIMATIONS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+.slide-frame{animation:fadeIn .3s ease}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   NOTIFICATION TOAST
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+.toast-wrap{
+  position:fixed;bottom:20px;left:50%;transform:translateX(-50%);
+  z-index:99999;display:flex;flex-direction:column;align-items:center;gap:8px;
+  pointer-events:none;
+}
+.toast{
+  font-size:12px;font-weight:600;
+  padding:8px 16px;border-radius:99px;
+  background:var(--surface);border:1px solid var(--border2);
+  color:var(--text);
+  animation:fadeIn .3s ease;
+  box-shadow:0 8px 24px rgba(0,0,0,.5);
+}
+.toast.ok{border-color:rgba(74,222,128,.4);color:#4ade80}
+.toast.err{border-color:rgba(248,113,113,.4);color:#f87171}
+.toast.info{border-color:rgba(108,99,255,.4);color:var(--accent2)}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   SLIDE DESIGNS (all 6 styles × all sizes)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+.SLIDE{
+  position:absolute;top:0;left:0;
+  transform-origin:top left;
+  direction:rtl;
+  font-family:'Tajawal','Cairo',sans-serif;
+  overflow:hidden;
+}
+
+/* ━━ STYLE: TECH ━━ */
+.SLIDE.s-tech{background:#ffffff;color:#0d0d0d}
+.SLIDE.s-tech .bg{
+  position:absolute;inset:0;
+  background-image:
+    linear-gradient(rgba(160,160,160,.15) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(160,160,160,.15) 1px,transparent 1px);
+  background-size:54px 54px;pointer-events:none;
+}
+.SLIDE.s-tech .bg::after{
+  content:'';position:absolute;inset:0;
+  background-image:
+    linear-gradient(rgba(160,160,160,.06) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(160,160,160,.06) 1px,transparent 1px);
+  background-size:18px 18px;
+}
+.SLIDE.s-tech .accent-color{color:#c6f135}
+.SLIDE.s-tech .accent-bg{background:#c6f135}
+.SLIDE.s-tech .accent-border{border-color:#c6f135}
+.SLIDE.s-tech .chip{background:#c6f135;color:#000}
+.SLIDE.s-tech .capsule{background:#c6f135}
+.SLIDE.s-tech .capsule *{color:#000}
+.SLIDE.s-tech .hdr-text{color:#555}
+.SLIDE.s-tech .num-ghost{color:#ebebeb;font-family:'Cairo',sans-serif}
+.SLIDE.s-tech .num-accent{color:#c6f135}
+.SLIDE.s-tech .main-title{color:#080808;font-family:'Cairo',sans-serif}
+.SLIDE.s-tech .body-text{color:#444}
+.SLIDE.s-tech .point-text{color:#222}
+.SLIDE.s-tech .footer-muted{color:#aaa}
+.SLIDE.s-tech .divider-line{background:rgba(0,0,0,.08)}
+.SLIDE.s-tech .tag-box{background:rgba(198,241,53,.15);border:1px solid rgba(198,241,53,.4)}
+
+/* ━━ STYLE: DARK ━━ */
+.SLIDE.s-dark{background:#06060a;color:#f0f0f5}
+.SLIDE.s-dark .bg{
+  position:absolute;inset:0;
+  background-image:
+    linear-gradient(rgba(80,80,180,.08) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(80,80,180,.08) 1px,transparent 1px);
+  background-size:60px 60px;pointer-events:none;
+}
+.SLIDE.s-dark .bg::after{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse 90% 60% at 50% 0%,rgba(120,60,255,.08) 0%,transparent 70%);
+}
+.SLIDE.s-dark .accent-color{color:#a78bfa}
+.SLIDE.s-dark .accent-bg{background:#a78bfa}
+.SLIDE.s-dark .chip{background:#a78bfa;color:#fff}
+.SLIDE.s-dark .capsule{background:#a78bfa}
+.SLIDE.s-dark .capsule *{color:#fff}
+.SLIDE.s-dark .hdr-text{color:#444466}
+.SLIDE.s-dark .num-ghost{color:#111118;font-family:'Cairo',sans-serif}
+.SLIDE.s-dark .num-accent{color:#a78bfa}
+.SLIDE.s-dark .main-title{color:#f5f5ff;font-family:'Cairo',sans-serif}
+.SLIDE.s-dark .body-text{color:#9090b0}
+.SLIDE.s-dark .point-text{color:#d0d0e8}
+.SLIDE.s-dark .footer-muted{color:#2a2a44}
+.SLIDE.s-dark .divider-line{background:rgba(255,255,255,.05)}
+.SLIDE.s-dark .tag-box{background:rgba(167,139,250,.1);border:1px solid rgba(167,139,250,.3)}
+
+/* ━━ STYLE: MODERN ━━ */
+.SLIDE.s-modern{background:#f6f1e9;color:#1a1209}
+.SLIDE.s-modern .bg{display:none}
+.SLIDE.s-modern .accent-color{color:#d4622a}
+.SLIDE.s-modern .accent-bg{background:#d4622a}
+.SLIDE.s-modern .chip{background:#d4622a;color:#fff;border-radius:4px!important}
+.SLIDE.s-modern .capsule{background:#1a1209;border-radius:4px!important}
+.SLIDE.s-modern .capsule *{color:#fff}
+.SLIDE.s-modern .capsule .nav-arrow{color:#d4622a}
+.SLIDE.s-modern .hdr-text{color:#aaa}
+.SLIDE.s-modern .num-ghost{color:#ece7de;font-family:'Cairo',sans-serif}
+.SLIDE.s-modern .num-accent{color:#d4622a}
+.SLIDE.s-modern .main-title{color:#0d0a06;font-family:'Cairo',sans-serif}
+.SLIDE.s-modern .body-text{color:#666}
+.SLIDE.s-modern .point-text{color:#333}
+.SLIDE.s-modern .footer-muted{color:#ccc}
+.SLIDE.s-modern .divider-line{background:rgba(0,0,0,.1)}
+.SLIDE.s-modern .tag-box{background:rgba(212,98,42,.08);border:1px solid rgba(212,98,42,.25)}
+
+/* ━━ STYLE: BRUTALIST ━━ */
+.SLIDE.s-brutalist{background:#f0efe9;color:#0a0a0a}
+.SLIDE.s-brutalist .bg{display:none}
+.SLIDE.s-brutalist .accent-color{color:#0a0a0a}
+.SLIDE.s-brutalist .accent-bg{background:#0a0a0a}
+.SLIDE.s-brutalist .chip{background:#0a0a0a;color:#f0efe9;border-radius:0!important;border:2px solid #0a0a0a}
+.SLIDE.s-brutalist .capsule{background:#0a0a0a;border-radius:0!important}
+.SLIDE.s-brutalist .capsule *{color:#f0efe9}
+.SLIDE.s-brutalist .hdr-text{color:#888}
+.SLIDE.s-brutalist .num-ghost{color:#e0dfd8;font-family:'Cairo',sans-serif;font-weight:900}
+.SLIDE.s-brutalist .num-accent{color:#0a0a0a}
+.SLIDE.s-brutalist .main-title{color:#0a0a0a;font-family:'Cairo',sans-serif;font-weight:900;letter-spacing:normal!important}
+.SLIDE.s-brutalist .body-text{color:#333}
+.SLIDE.s-brutalist .point-text{color:#111}
+.SLIDE.s-brutalist .footer-muted{color:#888}
+.SLIDE.s-brutalist .border-heavy{border:3px solid #0a0a0a}
+.SLIDE.s-brutalist .divider-line{background:#0a0a0a;height:3px!important}
+.SLIDE.s-brutalist .tag-box{background:#0a0a0a;border:none}
+.SLIDE.s-brutalist .tag-box *{color:#f0efe9!important}
+
+/* ━━ STYLE: GLASS ━━ */
+.SLIDE.s-glass{background:#0a1020;color:#e8eeff}
+.SLIDE.s-glass .bg{
+  position:absolute;inset:0;
+  background:
+    radial-gradient(ellipse 80% 50% at 20% 0%,rgba(56,189,248,.07) 0%,transparent 60%),
+    radial-gradient(ellipse 60% 60% at 80% 100%,rgba(139,92,246,.08) 0%,transparent 60%);
+  pointer-events:none;
+}
+.SLIDE.s-glass .bg::after{
+  content:'';position:absolute;inset:0;
+  background-image:
+    linear-gradient(rgba(100,150,255,.04) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(100,150,255,.04) 1px,transparent 1px);
+  background-size:40px 40px;
+}
+.SLIDE.s-glass .accent-color{color:#38bdf8}
+.SLIDE.s-glass .accent-bg{background:rgba(56,189,248,.15);border:1px solid rgba(56,189,248,.3)}
+.SLIDE.s-glass .chip{
+  background:rgba(56,189,248,.15);color:#38bdf8;
+  border:1px solid rgba(56,189,248,.35);backdrop-filter:blur(8px);
+}
+.SLIDE.s-glass .capsule{
+  background:rgba(56,189,248,.12);
+  border:1px solid rgba(56,189,248,.3);
+  backdrop-filter:blur(8px);
+}
+.SLIDE.s-glass .capsule *{color:#38bdf8}
+.SLIDE.s-glass .hdr-text{color:#334466}
+.SLIDE.s-glass .num-ghost{color:#0d1630;font-family:'Cairo',sans-serif}
+.SLIDE.s-glass .num-accent{color:#38bdf8}
+.SLIDE.s-glass .main-title{color:#e8eeff;font-family:'Cairo',sans-serif}
+.SLIDE.s-glass .body-text{color:#6080a0}
+.SLIDE.s-glass .point-text{color:#c0d0e8}
+.SLIDE.s-glass .footer-muted{color:#152040}
+.SLIDE.s-glass .divider-line{background:rgba(56,189,248,.12)}
+.SLIDE.s-glass .tag-box{background:rgba(56,189,248,.07);border:1px solid rgba(56,189,248,.2)}
+.SLIDE.s-glass .glass-panel{
+  background:rgba(255,255,255,.03);
+  border:1px solid rgba(255,255,255,.06);
+  backdrop-filter:blur(20px);border-radius:12px;
+}
+
+/* ━━ STYLE: GRADIENT ━━ */
+.SLIDE.s-gradient{
+  background:#0d0520;
+  color:#f5f0ff;
+}
+.SLIDE.s-gradient .bg{
+  position:absolute;inset:0;
+  background:
+    radial-gradient(ellipse 100% 70% at 100% 0%,rgba(168,85,247,.18) 0%,transparent 50%),
+    radial-gradient(ellipse 80% 60% at 0% 100%,rgba(236,72,153,.12) 0%,transparent 50%),
+    radial-gradient(ellipse 60% 50% at 50% 50%,rgba(59,130,246,.06) 0%,transparent 70%);
+  pointer-events:none;
+}
+.SLIDE.s-gradient .accent-color{color:#e879f9}
+.SLIDE.s-gradient .accent-bg{background:linear-gradient(135deg,#a855f7,#ec4899)}
+.SLIDE.s-gradient .chip{
+  background:linear-gradient(135deg,#a855f7,#ec4899);color:#fff;
+}
+.SLIDE.s-gradient .capsule{background:linear-gradient(135deg,#a855f7,#ec4899)}
+.SLIDE.s-gradient .capsule *{color:#fff}
+.SLIDE.s-gradient .hdr-text{color:#3a1a5a}
+.SLIDE.s-gradient .num-ghost{color:#150928;font-family:'Cairo',sans-serif}
+.SLIDE.s-gradient .num-accent{color:#e879f9}
+.SLIDE.s-gradient .main-title{color:#f5f0ff;font-family:'Cairo',sans-serif}
+.SLIDE.s-gradient .body-text{color:#9060b0}
+.SLIDE.s-gradient .point-text{color:#e0c8f8}
+.SLIDE.s-gradient .footer-muted{color:#200840}
+.SLIDE.s-gradient .divider-line{background:rgba(168,85,247,.2)}
+.SLIDE.s-gradient .tag-box{background:rgba(168,85,247,.12);border:1px solid rgba(168,85,247,.35)}
+
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════
+     APP SHELL
+═══════════════════════════════════════════ -->
+<div class="app">
+
+  <!-- TOPBAR -->
+  <header class="topbar">
+    <div class="topbar-logo">
+      <div class="logo-icon">C</div>
+      Carousel Studio
+      <span class="topbar-badge">PRO</span>
+    </div>
+
+    <div class="topbar-center">
+      <div class="topbar-pills" id="viewPills">
+        <button class="t-pill active" onclick="setViewMode('grid3',this)">⊞ 3 أعمدة</button>
+        <button class="t-pill" onclick="setViewMode('grid2',this)">⊟ عمودان</button>
+        <button class="t-pill" onclick="setViewMode('single',this)">▭ واحد</button>
+      </div>
+    </div>
+
+    <div class="topbar-actions">
+      <button class="topbar-btn" onclick="loadDemo()">⚡ تجريبي</button>
+      <button class="topbar-btn btn-export" id="btnDL" onclick="downloadAll()" disabled>
+        <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5 5 5-5M12 15V3"/>
+        </svg>
+        تحميل الكل
+      </button>
+      <button class="topbar-btn primary" id="btnGen" onclick="generateCarousel()">
+        <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+        </svg>
+        توليد
+      </button>
+    </div>
+  </header>
+
+  <!-- MAIN -->
+  <div class="app-main">
+
+    <!-- ════ LEFT SIDEBAR — Content & Setup ════ -->
+    <aside class="sidebar sidebar-left">
+
+      <!-- API KEY -->
+      <div class="sidebar-section">
+        <div class="sec-title">
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 11-7.778 7.778 5.5 5.5 0 017.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>
+          اتصال Gemini API
+        </div>
+        <div class="field">
+          <label>مفتاح API</label>
+          <input type="password" id="apiKey" placeholder="AIzaSy..." autocomplete="off">
+        </div>
+      </div>
+
+      <!-- TOPIC -->
+      <div class="sidebar-section">
+        <div class="sec-title">
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+          المحتوى
+        </div>
+        <div class="field">
+          <label>الموضوع</label>
+          <textarea id="topic" dir="rtl" placeholder="مثال: أخطاء قاتلة في تصميم الشعارات&#10;مثال: كيف تختار الألوان للهويات البصرية"></textarea>
+        </div>
+        <div class="counter-row">
+          <label>عدد السلايدات</label>
+          <div class="counter-ctrl">
+            <button class="counter-btn" onclick="adjCount(-1)">−</button>
+            <div class="counter-num" id="cntNum">5</div>
+            <button class="counter-btn" onclick="adjCount(+1)">+</button>
+          </div>
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label>اسم الحساب</label>
+            <input type="text" id="acctName" placeholder="@DesignPro">
+          </div>
+          <div class="field">
+            <label>هاشتاق</label>
+            <input type="text" id="acctTag" placeholder="#تصميم">
+          </div>
+        </div>
+      </div>
+
+      <!-- SIZE PICKER -->
+      <div class="sidebar-section">
+        <div class="sec-title">
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+          القياس والأبعاد
+        </div>
+
+        <div style="font-size:10px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--muted);margin-bottom:7px">كاروسيل ومنشور فردي</div>
+        <div class="size-grid" id="sizeGrid">
+          <div class="size-card active" data-w="1080" data-h="1350" data-id="carousel-v" onclick="pickSize(this)">
+            <div class="size-visual" style="width:20px;height:26px;background:none"></div>
+            <span>عمودي</span>
+            <small>1080×1350</small>
+          </div>
+          <div class="size-card" data-w="1080" data-h="1440" data-id="carousel-vl" onclick="pickSize(this)">
+            <div class="size-visual" style="width:18px;height:27px;background:none"></div>
+            <span>طويل</span>
+            <small>1080×1440</small>
+          </div>
+          <div class="size-card" data-w="1080" data-h="1080" data-id="square" onclick="pickSize(this)">
+            <div class="size-visual" style="width:22px;height:22px;background:none"></div>
+            <span>مربع</span>
+            <small>1080×1080</small>
+          </div>
+        </div>
+
+        <div style="font-size:10px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--muted);margin-bottom:7px;margin-top:12px">مصغرات (ثمبنيل)</div>
+        <div class="orient-row">
+          <button class="orient-btn" data-w="1080" data-h="1920" data-id="thumb-v" onclick="pickOrient(this)">
+            <div class="orient-icon" style="width:14px;height:24px"></div>
+            <span style="font-size:10px;color:var(--muted2)">طولي<br><small style="font-size:8px;opacity:.7">9×16</small></span>
+          </button>
+          <button class="orient-btn" data-w="1920" data-h="1080" data-id="thumb-h" onclick="pickOrient(this)">
+            <div class="orient-icon" style="width:24px;height:14px"></div>
+            <span style="font-size:10px;color:var(--muted2)">عرضي<br><small style="font-size:8px;opacity:.7">16×9</small></span>
+          </button>
+          <button class="orient-btn active" data-id="thumb-both" onclick="pickOrient(this)">
+            <div style="display:flex;gap:3px;align-items:center">
+              <div class="orient-icon" style="width:10px;height:16px"></div>
+              <div class="orient-icon" style="width:16px;height:10px"></div>
+            </div>
+            <span style="font-size:10px;color:var(--muted2)">النوعان</span>
+          </button>
+        </div>
+
+        <div class="toggle-row">
+          <label for="thumb-on">توليد مصغرات أيضاً</label>
+          <label class="toggle"><input type="checkbox" id="thumb-on" checked><div class="toggle-track"></div><div class="toggle-thumb"></div></label>
+        </div>
+      </div>
+
+      <!-- GENERATE -->
+      <div class="sidebar-section">
+        <div class="progress-track" id="progTrack"><div class="progress-fill" id="progFill"></div></div>
+        <div class="status-msg" id="statusMsg">جاهز للتوليد ✨</div>
+        <button class="btn btn-primary" id="genBtn" onclick="generateCarousel()">
+          <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+          توليد الكاروسيل السحري
+        </button>
+        <div style="height:6px"></div>
+        <button class="btn btn-outline" id="dlBtn" onclick="downloadAll()" disabled>
+          <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5 5 5-5M12 15V3"/></svg>
+          تحميل الكاروسيل كصور
+        </button>
+      </div>
+
+    </aside>
+
+    <!-- ════ CANVAS ════ -->
+    <main class="canvas-area">
+      <div class="canvas-toolbar">
+        <div class="canvas-toolbar-left">
+          <div class="canvas-info">
+            <span id="slideCountInfo">— سلايدات</span>
+            <span class="dim-badge" id="dimBadge">1080 × 1350</span>
+          </div>
+        </div>
+        <div class="view-btns">
+          <button class="view-btn" title="تكبير الكل" onclick="zoomCanvas(+.1)">+</button>
+          <button class="view-btn" title="Reset" onclick="zoomCanvas(0)">⟲</button>
+          <button class="view-btn" title="تصغير" onclick="zoomCanvas(-.1)">−</button>
+        </div>
+      </div>
+
+      <div class="canvas-scroll" id="canvasScroll">
+        <div class="empty-state" id="emptyState">
+          <div class="empty-icon">✦</div>
+          <div class="empty-title">لا يوجد كاروسيل بعد</div>
+          <div class="empty-text">اختر ستايل التصميم، أدخل موضوعاً، واضغط "توليد" لبدء الإنشاء الاحترافي.</div>
+          <button class="btn btn-ghost" style="width:auto;font-size:12px" onclick="loadDemo()">⚡ تحميل كاروسيل تجريبي</button>
+        </div>
+        <div class="slides-container grid-3" id="slidesContainer" style="display:none"></div>
+      </div>
+    </main>
+
+    <!-- ════ RIGHT SIDEBAR — Style ════ -->
+    <aside class="sidebar sidebar-right">
+
+      <!-- STYLE PICKER -->
+      <div class="sidebar-section">
+        <div class="sec-title">
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/><path d="M2 12h20"/></svg>
+          ستايل التصميم
+        </div>
+        <div class="style-grid" id="styleGrid">
+          <div class="style-card active" data-style="tech" onclick="pickStyle(this,'tech')">
+            <div class="style-check">✓</div>
+            <div class="style-preview sp-tech">
+              <div style="position:absolute;inset:0;background-image:linear-gradient(rgba(160,160,160,.15) 1px,transparent 1px),linear-gradient(90deg,rgba(160,160,160,.15) 1px,transparent 1px);background-size:12px 12px"></div>
+              <span class="sp-title" style="color:#0d0d0d">تقني</span>
+              <div class="sp-circle" style="background:#c6f135;width:16px;height:16px;top:8px;left:8px"></div>
+              <div class="sp-line" style="background:#c6f135"></div>
+            </div>
+            <div class="style-info">
+              <div class="style-name">التقني الأبيض</div>
+              <div class="style-desc">شبكة Blueprint · أخضر نيون</div>
+            </div>
+          </div>
+
+          <div class="style-card" data-style="dark" onclick="pickStyle(this,'dark')">
+            <div class="style-check">✓</div>
+            <div class="style-preview sp-dark">
+              <div style="position:absolute;inset:0;background-image:linear-gradient(rgba(80,80,180,.1) 1px,transparent 1px),linear-gradient(90deg,rgba(80,80,180,.1) 1px,transparent 1px);background-size:12px 12px"></div>
+              <span class="sp-title" style="color:#a78bfa">مظلم</span>
+              <div class="sp-circle" style="background:#a78bfa;width:16px;height:16px;top:8px;left:8px"></div>
+              <div class="sp-line" style="background:#a78bfa"></div>
+            </div>
+            <div class="style-info">
+              <div class="style-name">المظلم الفاخر</div>
+              <div class="style-desc">فحمي عميق · بنفسجي نيون</div>
+            </div>
+          </div>
+
+          <div class="style-card" data-style="modern" onclick="pickStyle(this,'modern')">
+            <div class="style-check">✓</div>
+            <div class="style-preview sp-modern">
+              <span class="sp-title" style="color:#1a1209;font-size:11px">مودرن</span>
+              <div class="sp-circle" style="background:#d4622a;width:16px;height:16px;top:8px;left:8px;border-radius:3px"></div>
+              <div class="sp-line" style="background:#d4622a;height:3px"></div>
+            </div>
+            <div class="style-info">
+              <div class="style-name">المودرن البسيط</div>
+              <div class="style-desc">كريمي دافئ · برتقالي</div>
+            </div>
+          </div>
+
+          <div class="style-card" data-style="brutalist" onclick="pickStyle(this,'brutalist')">
+            <div class="style-check">✓</div>
+            <div class="style-preview sp-brutalist">
+              <div style="position:absolute;bottom:0;left:0;right:0;height:6px;background:#0a0a0a"></div>
+              <span class="sp-title" style="color:#0a0a0a;font-size:12px;font-weight:900;letter-spacing:-2px">BRUTAL</span>
+              <div style="position:absolute;top:8px;left:8px;width:16px;height:16px;border:3px solid #0a0a0a"></div>
+            </div>
+            <div class="style-info">
+              <div class="style-name">البروتاليست</div>
+              <div class="style-desc">خطوط سميكة · أبيض وأسود</div>
+            </div>
+          </div>
+
+          <div class="style-card" data-style="glass" onclick="pickStyle(this,'glass')">
+            <div class="style-check">✓</div>
+            <div class="style-preview sp-glass">
+              <div style="position:absolute;inset:8px 6px;border-radius:6px;background:rgba(255,255,255,.04);border:1px solid rgba(56,189,248,.2)"></div>
+              <span class="sp-title" style="color:#38bdf8;font-size:11px;z-index:1">زجاجي</span>
+              <div class="sp-line" style="background:#38bdf8"></div>
+            </div>
+            <div class="style-info">
+              <div class="style-name">الزجاجي المضيء</div>
+              <div class="style-desc">Glassmorphism · أزرق سماوي</div>
+            </div>
+          </div>
+
+          <div class="style-card" data-style="gradient" onclick="pickStyle(this,'gradient')">
+            <div class="style-check">✓</div>
+            <div class="style-preview sp-gradient">
+              <div style="position:absolute;inset:0;background:radial-gradient(ellipse at 80% 20%,rgba(168,85,247,.4),transparent 60%),radial-gradient(ellipse at 20% 80%,rgba(236,72,153,.3),transparent 60%)"></div>
+              <span class="sp-title" style="color:#e879f9;font-size:11px;z-index:1">فاخر</span>
+              <div class="sp-line" style="background:linear-gradient(90deg,#a855f7,#ec4899)"></div>
+            </div>
+            <div class="style-info">
+              <div class="style-name">الغرادينت الفاخر</div>
+              <div class="style-desc">تدرجات نيون · بنفسجي وردي</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TYPOGRAPHY -->
+      <div class="sidebar-section">
+        <div class="sec-title">
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7V4h16v3M9 20h6M12 4v16"/></svg>
+          الخط العربي
+        </div>
+        <div class="field">
+          <label>الخط الرئيسي</label>
+          <select id="fontSelect" onchange="rerenderSlides()">
+            <option value="'Tajawal',sans-serif">Tajawal — طجوال</option>
+            <option value="'Cairo',sans-serif">Cairo — كايرو</option>
+            <option value="'Almarai',sans-serif">Almarai — المراعي</option>
+            <option value="'IBM Plex Sans Arabic',sans-serif">IBM Plex — بلكس عربي</option>
+            <option value="'Noto Kufi Arabic',sans-serif">Noto Kufi — نوتو كوفي</option>
+            <option value="'El Messiri',sans-serif">El Messiri — المسيري</option>
+            <option value="'Changa',sans-serif">Changa — تشانغا</option>
+            <option value="'Reem Kufi',sans-serif">Reem Kufi — ريم كوفي</option>
+            <option value="'Markazi Text',serif">Markazi — مركازي</option>
+            <option value="'Lalezar',sans-serif">Lalezar — لاليزار</option>
+            <option value="'Amiri',serif">Amiri — أميري</option>
+            <option value="'Mada',sans-serif">Mada — مدى</option>
+            <option value="'Jomhuria',sans-serif">Jomhuria — جمهورية</option>
+          </select>
+        </div>
+        <div class="slider-field">
+          <div class="slider-header">
+            <label>حجم العنوان الرئيسي</label>
+            <span class="slider-val" id="titleSzVal">72</span>
+          </div>
+          <input type="range" id="titleSz" min="48" max="120" value="72" oninput="document.getElementById('titleSzVal').textContent=this.value;rerenderSlides()">
+        </div>
+        <div class="slider-field">
+          <div class="slider-header">
+            <label>حجم نص النقاط</label>
+            <span class="slider-val" id="bodySzVal">26</span>
+          </div>
+          <input type="range" id="bodySz" min="18" max="44" value="26" oninput="document.getElementById('bodySzVal').textContent=this.value;rerenderSlides()">
+        </div>
+        <div class="toggle-row">
+          <label for="lineHeightMode">تباعد الأسطر يدوي</label>
+          <label class="toggle"><input type="checkbox" id="lineHeightMode" onchange="toggleLineHeightMode()"><div class="toggle-track"></div><div class="toggle-thumb"></div></label>
+        </div>
+        <div class="slider-field" id="lineHeightSliderWrap" style="display:none">
+          <div class="slider-header">
+            <label>قيمة تباعد الأسطر</label>
+            <span class="slider-val" id="lineHeightVal">1.6</span>
+          </div>
+          <input type="range" id="lineHeightSlider" min="1" max="2.5" step="0.05" value="1.6" oninput="document.getElementById('lineHeightVal').textContent=this.value;rerenderSlides()">
+        </div>
+      </div>
+
+      <!-- LAYOUT OPTIONS -->
+      <div class="sidebar-section">
+        <div class="sec-title">
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+          خيارات التخطيط
+        </div>
+        <div class="toggle-row">
+          <label for="showNum">إظهار رقم السلايد</label>
+          <label class="toggle"><input type="checkbox" id="showNum" checked onchange="rerenderSlides()"><div class="toggle-track"></div><div class="toggle-thumb"></div></label>
+        </div>
+        <div class="toggle-row">
+          <label for="showFooter">شريط التنقل السفلي</label>
+          <label class="toggle"><input type="checkbox" id="showFooter" checked onchange="rerenderSlides()"><div class="toggle-track"></div><div class="toggle-thumb"></div></label>
+        </div>
+        <div class="toggle-row">
+          <label for="showGrid">خلفية الشبكة</label>
+          <label class="toggle"><input type="checkbox" id="showGrid" checked onchange="rerenderSlides()"><div class="toggle-track"></div><div class="toggle-thumb"></div></label>
+        </div>
+        <div class="slider-field">
+          <div class="slider-header">
+            <label>المسافة الداخلية</label>
+            <span class="slider-val" id="padVal">56</span>
+          </div>
+          <input type="range" id="padSlider" min="32" max="90" value="56" oninput="document.getElementById('padVal').textContent=this.value;rerenderSlides()">
+        </div>
+      </div>
+
+      <!-- ABOUT / GITHUB -->
+      <div class="sidebar-section">
+        <div class="sec-title">
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 00-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0020 4.77 5.07 5.07 0 0019.91 1S18.73.65 16 2.48a13.38 13.38 0 00-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 005 4.77a5.44 5.44 0 00-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 009 18.13V22"/></svg>
+          GitHub &amp; المشروع
+        </div>
+        <div style="font-size:11px;color:var(--muted2);line-height:1.7;margin-bottom:8px">
+          هذا المشروع جاهز للرفع على GitHub. يحتوي الملف على كل الأصول داخله — لا يحتاج سيرفر.
+        </div>
+        <button class="btn btn-ghost btn-xs" style="width:auto;font-size:10px" onclick="downloadHTML()">⬇ تحميل index.html</button>
+      </div>
+
+    </aside>
+
+  </div><!-- /app-main -->
+</div><!-- /app -->
+
+<!-- MODAL -->
+<div class="modal" id="modal">
+  <button class="modal-close" onclick="closeModal()">✕</button>
+  <button class="modal-nav prev" id="modalPrev" onclick="modalNav(-1)">‹</button>
+  <div class="modal-frame" id="modalFrame"></div>
+  <button class="modal-nav next" id="modalNext" onclick="modalNav(+1)">›</button>
+</div>
+
+<!-- EDIT TEXT MODAL -->
+<div class="modal" id="editModal">
+  <button class="modal-close" onclick="closeEditModal()">✕</button>
+  <div class="side-panel">
+    <h3>✏️ تعديل نص السلايد</h3>
+    <div class="field">
+      <label>العنوان</label>
+      <textarea id="editTitle" dir="rtl" style="min-height:60px"></textarea>
+    </div>
+    <div class="field" id="editDescWrap">
+      <label>الوصف</label>
+      <textarea id="editDesc" dir="rtl" style="min-height:80px"></textarea>
+    </div>
+    <div class="field" id="editPointsWrap">
+      <label>النقاط (كل نقطة في سطر جديد)</label>
+      <textarea id="editPoints" dir="rtl" style="min-height:130px"></textarea>
+    </div>
+    <button class="btn btn-primary" style="margin-top:8px" onclick="saveEditModal()">💾 حفظ التعديلات</button>
+  </div>
+</div>
+
+<!-- ICON PICKER MODAL -->
+<div class="modal" id="iconModal">
+  <button class="modal-close" onclick="closeIconPicker()">✕</button>
+  <div class="side-panel">
+    <h3>🙂 اختر أيقونة للسلايد</h3>
+    <div id="iconGroups"></div>
+  </div>
+</div>
+
+<!-- SLIDE IMAGE MODAL -->
+<div class="modal" id="imageModal">
+  <button class="modal-close" onclick="closeImageModal()">✕</button>
+  <div class="side-panel" style="width:420px">
+    <h3>🖼️ صورة السلايد (تظهر أسفل المنتصف)</h3>
+
+    <div class="img-tabs">
+      <button class="img-tab active" data-tab="upload" onclick="switchImgTab('upload',this)">📤 رفع صورة</button>
+      <button class="img-tab" data-tab="flat" onclick="switchImgTab('flat',this)">🧩 أيقونة فلات</button>
+      <button class="img-tab" data-tab="url" onclick="switchImgTab('url',this)">🔗 رابط صورة</button>
+    </div>
+
+    <div class="img-tab-panel" id="tab-upload">
+      <div class="field">
+        <label>صورة حقيقية من جهازك (تُعرض داخل إطار)</label>
+        <input type="file" id="imgUploadInput" accept="image/*" onchange="handleImageUpload(event)">
+      </div>
+      <div class="toggle-row">
+        <label for="imgUploadFramed">وضع الصورة بإطار</label>
+        <label class="toggle"><input type="checkbox" id="imgUploadFramed" checked><div class="toggle-track"></div><div class="toggle-thumb"></div></label>
+      </div>
+      <div id="imgUploadPreview"></div>
+      <div class="img-note">أفضل خيار لو بدك صورة حقيقية ومضمون ظهورها 100% عند التصدير.</div>
+    </div>
+
+    <div class="img-tab-panel" id="tab-flat" style="display:none">
+      <div class="icon-grid flat-icon-grid" id="flatIconGrid"></div>
+      <div class="img-note">أيقونات بستايل Flat Icon موحّد — تُضاف فوراً بدون إطار.</div>
+    </div>
+
+    <div class="img-tab-panel" id="tab-url" style="display:none">
+      <div class="field">
+        <label>رابط صورة مباشر (مثلاً PNG مفرّغ من pngegg، أو رابط صورة من جوجل)</label>
+        <input type="text" id="imgUrlInput" placeholder="https://..." dir="ltr">
+      </div>
+      <div class="toggle-row">
+        <label for="imgUrlFramed">وضع الصورة بإطار (للصور الحقيقية فقط)</label>
+        <label class="toggle"><input type="checkbox" id="imgUrlFramed"><div class="toggle-track"></div><div class="toggle-thumb"></div></label>
+      </div>
+      <button class="btn btn-outline btn-sm" style="margin-top:6px" onclick="applyImageUrl()">معاينة وتطبيق الرابط</button>
+      <div class="img-note">⚠️ الروابط الخارجية (pngegg، جوجل، إلخ) ممكن ما تظهر أثناء تحميل الكاروسيل كصور PNG بسبب قيود حماية CORS من تلك المواقع. إذا بدك تصدير مضمون 100%: حمّل الصورة لجهازك أولاً وارفعها من تبويب "رفع صورة".</div>
+    </div>
+
+    <button class="btn btn-ghost btn-sm" style="width:auto;margin-top:14px" onclick="removeSlideImage()">🗑 إزالة الصورة من هذا السلايد</button>
+  </div>
+</div>
+
+<!-- TOASTS -->
+<div class="toast-wrap" id="toastWrap"></div>
+
+<!-- ═══════════════════════════════════════════
+     JAVASCRIPT
+═══════════════════════════════════════════ -->
+<script>
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   STATE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+const S = {
+  style: 'tech',
+  slides: [],
+  count: 5,
+  canvasZoom: 1,
+  viewMode: 'grid3',
+  modalIdx: 0,
+  // Size: {w, h, id, isThumb}
+  mainSize: { w: 1080, h: 1350, id: 'carousel-v', isThumb: false },
+  thumbMode: 'both', // 'v','h','both'
+  thumbEnabled: true,
+};
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   SIZE CONFIG
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+const SIZES = {
+  'carousel-v':  { w:1080, h:1350, label:'1080×1350' },
+  'carousel-vl': { w:1080, h:1440, label:'1080×1440' },
+  'square':      { w:1080, h:1080, label:'1080×1080' },
+  'thumb-v':     { w:1080, h:1920, label:'1080×1920 (9:16)' },
+  'thumb-h':     { w:1920, h:1080, label:'1920×1080 (16:9)' },
+};
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   STYLE ACCENT COLORS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+const ACCENTS = {
+  tech:      '#c6f135',
+  dark:      '#a78bfa',
+  modern:    '#d4622a',
+  brutalist: '#0a0a0a',
+  glass:     '#38bdf8',
+  gradient:  '#e879f9',
+};
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   ICON SETS (emoji picker)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+const ICON_SETS = {
+  'تصميم وإبداع':   ['🎨','✏️','📐','🖌️','🧩','🖼️','✂️','📏'],
+  'أعمال وأهداف':   ['💼','📈','🎯','🚀','⭐','🏆','📊','💰'],
+  'تقنية':          ['💻','📱','⚡','🔧','🛠️','🔍','🌐','🤖'],
+  'تواصل وتفاعل':   ['💬','📣','🔔','✉️','👥','❤️','👍','🔗'],
+  'تحفيز وطاقة':    ['🔥','✨','💪','🌟','🎉','🙌','🧠','💡'],
+  'تنبيه وتحذير':   ['⚠️','❌','🚫','⏰','📍','🛑','❗','🔒'],
+};
+function defaultIconFor(data,idx,total){
+  if(data.type==='cover'||idx===0) return '✦';
+  if(data.type==='cta'||idx===total-1) return '🎯';
+  return '💡';
+}
+function toggleLineHeightMode(){
+  const manual=document.getElementById('lineHeightMode').checked;
+  document.getElementById('lineHeightSliderWrap').style.display=manual?'block':'none';
+  rerenderSlides();
+}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   FLAT ICON LIBRARY (for slide images)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+const FLAT_ICON_LIB = [
+  {key:'idea',     label:'فكرة',     bg:'#fbbf24', inner:'<circle cx="32" cy="26" r="14" fill="#fff"/><rect x="26" y="40" width="12" height="12" rx="3" fill="#fff"/><rect x="24" y="54" width="16" height="4" rx="2" fill="#fff"/>'},
+  {key:'rocket',   label:'انطلاقة',  bg:'#ef4444', inner:'<path d="M32 6 C40 14 44 26 40 40 L24 40 C20 26 24 14 32 6Z" fill="#fff"/><circle cx="32" cy="24" r="4" fill="#ef4444"/><path d="M24 40 L16 50 L24 48Z" fill="#fff"/><path d="M40 40 L48 50 L40 48Z" fill="#fff"/><rect x="28" y="48" width="8" height="10" rx="3" fill="#fff"/>'},
+  {key:'target',   label:'هدف',      bg:'#3b82f6', inner:'<circle cx="32" cy="32" r="22" fill="none" stroke="#fff" stroke-width="4"/><circle cx="32" cy="32" r="13" fill="none" stroke="#fff" stroke-width="4"/><circle cx="32" cy="32" r="5" fill="#fff"/>'},
+  {key:'megaphone',label:'إعلان',    bg:'#f97316', inner:'<path d="M14 26 L34 14 V50 L14 38 Z" fill="#fff"/><rect x="9" y="24" width="6" height="16" rx="2" fill="#fff"/><path d="M34 20 C44 20 48 26 48 32 C48 38 44 44 34 44" fill="none" stroke="#fff" stroke-width="3"/>'},
+  {key:'chart',    label:'نمو',      bg:'#22c55e', inner:'<rect x="12" y="36" width="9" height="20" rx="2" fill="#fff"/><rect x="27" y="24" width="9" height="32" rx="2" fill="#fff"/><rect x="42" y="12" width="9" height="44" rx="2" fill="#fff"/>'},
+  {key:'gear',     label:'إعدادات', bg:'#64748b', inner:'<circle cx="32" cy="32" r="9" fill="none" stroke="#fff" stroke-width="6"/><g fill="#fff"><rect x="29" y="6" width="6" height="10" rx="2"/><rect x="29" y="48" width="6" height="10" rx="2"/><rect x="6" y="29" width="10" height="6" rx="2"/><rect x="48" y="29" width="10" height="6" rx="2"/></g>'},
+  {key:'palette',  label:'تصميم',    bg:'#a855f7', inner:'<path d="M32 12c11 0 20 8 20 18 0 8-6 14-13 14-3 0-4-2-4-4s2-3 2-6c0-3-3-5-7-5-9 0-16-6-16-13 0-7 8-4 18-4z" fill="#fff"/><circle cx="22" cy="28" r="3" fill="#a855f7"/><circle cx="30" cy="22" r="3" fill="#a855f7"/><circle cx="40" cy="24" r="3" fill="#a855f7"/>'},
+  {key:'trophy',   label:'إنجاز',    bg:'#eab308', inner:'<path d="M20 12h24v10a12 12 0 01-24 0z" fill="#fff"/><rect x="27" y="34" width="10" height="10" fill="#fff"/><rect x="20" y="46" width="24" height="6" rx="2" fill="#fff"/><path d="M20 16h-6a6 6 0 006 8" fill="none" stroke="#fff" stroke-width="3"/><path d="M44 16h6a6 6 0 01-6 8" fill="none" stroke="#fff" stroke-width="3"/>'},
+  {key:'chat',     label:'تواصل',    bg:'#06b6d4', inner:'<rect x="10" y="14" width="44" height="28" rx="10" fill="#fff"/><path d="M22 42 L18 52 L30 42 Z" fill="#fff"/><circle cx="24" cy="28" r="2.6" fill="#06b6d4"/><circle cx="32" cy="28" r="2.6" fill="#06b6d4"/><circle cx="40" cy="28" r="2.6" fill="#06b6d4"/>'},
+  {key:'shield',   label:'أمان',     bg:'#0ea5e9', inner:'<path d="M32 8 L52 16 V32 C52 46 32 56 32 56 C32 56 12 46 12 32 V16 Z" fill="#fff"/><path d="M24 32 L30 38 L42 24" fill="none" stroke="#0ea5e9" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>'},
+  {key:'camera',   label:'محتوى',    bg:'#475569', inner:'<rect x="10" y="20" width="44" height="30" rx="6" fill="#fff"/><rect x="24" y="12" width="16" height="10" rx="3" fill="#fff"/><circle cx="32" cy="35" r="9" fill="#475569"/><circle cx="32" cy="35" r="4.5" fill="#fff"/>'},
+  {key:'book',     label:'معرفة',    bg:'#7c3aed', inner:'<path d="M14 14h16a4 4 0 014 4v32a4 4 0 00-4-4H14z" fill="#fff"/><path d="M50 14H34a4 4 0 00-4 4v32a4 4 0 014-4h16z" fill="#fff"/>'},
+  {key:'heart',    label:'مجتمع',    bg:'#ec4899', inner:'<path d="M32 52 C10 36 6 22 16 14 C24 8 32 14 32 20 C32 14 40 8 48 14 C58 22 54 36 32 52Z" fill="#fff"/>'},
+  {key:'clock',    label:'وقت',      bg:'#14b8a6', inner:'<circle cx="32" cy="32" r="20" fill="none" stroke="#fff" stroke-width="5"/><line x1="32" y1="32" x2="32" y2="18" stroke="#fff" stroke-width="4" stroke-linecap="round"/><line x1="32" y1="32" x2="42" y2="32" stroke="#fff" stroke-width="4" stroke-linecap="round"/>'},
+  {key:'star',     label:'جودة',     bg:'#f59e0b', inner:'<path d="M32 8 L39 24 L57 25 L43 36 L48 54 L32 44 L16 54 L21 36 L7 25 L25 24Z" fill="#fff"/>'},
+  {key:'link',     label:'ربط',      bg:'#10b981', inner:'<rect x="8" y="26" width="26" height="12" rx="6" fill="none" stroke="#fff" stroke-width="5" transform="rotate(-30 21 32)"/><rect x="30" y="26" width="26" height="12" rx="6" fill="none" stroke="#fff" stroke-width="5" transform="rotate(-30 43 32)"/>'},
+];
+function flatIconSVG(ic){
+  return `<svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%;display:block"><rect width="64" height="64" rx="16" fill="${ic.bg}"/>${ic.inner}</svg>`;
+}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   UI HELPERS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+function toast(msg, type='info', ms=2600){
+  const w=document.getElementById('toastWrap');
+  const d=document.createElement('div');
+  d.className='toast '+type;d.textContent=msg;
+  w.appendChild(d);setTimeout(()=>d.remove(),ms);
+}
+function setStatus(msg,type=''){
+  const el=document.getElementById('statusMsg');
+  el.textContent=msg;el.className='status-msg '+type;
+}
+function setProgress(pct){
+  const t=document.getElementById('progTrack'),f=document.getElementById('progFill');
+  if(pct>0)t.classList.add('show');else t.classList.remove('show');
+  f.style.width=pct+'%';
+}
+function setLoading(on){
+  const b=document.getElementById('genBtn');
+  const bt=document.getElementById('topbar-btn-gen');
+  b.disabled=on;
+  if(on){b.innerHTML='<div class="spinner"></div> جاري التوليد...';}
+  else{b.innerHTML='<svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg> توليد الكاروسيل السحري';}
+}
+function updateDimBadge(){
+  const sz=S.mainSize;
+  document.getElementById('dimBadge').textContent=`${sz.w} × ${sz.h}`;
+}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   SIZE SELECTION
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+function pickSize(el){
+  document.querySelectorAll('.size-card').forEach(c=>c.classList.remove('active'));
+  el.classList.add('active');
+  // Deactivate orientation buttons (main size chosen)
+  document.querySelectorAll('.orient-btn').forEach(b=>b.classList.remove('active'));
+  S.mainSize={w:+el.dataset.w, h:+el.dataset.h, id:el.dataset.id, isThumb:false};
+  updateDimBadge();
+  if(S.slides.length) rerenderSlides();
+}
+function pickOrient(el){
+  document.querySelectorAll('.size-card').forEach(c=>c.classList.remove('active'));
+  document.querySelectorAll('.orient-btn').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active');
+  const id=el.dataset.id;
+  if(id==='thumb-v')   S.mainSize={w:1080,h:1920,id:'thumb-v',isThumb:true};
+  else if(id==='thumb-h') S.mainSize={w:1920,h:1080,id:'thumb-h',isThumb:true};
+  else S.mainSize={w:1080,h:1350,id:'carousel-v',isThumb:false}; // both → show portrait as default
+  S.thumbMode = id==='thumb-v'?'v':id==='thumb-h'?'h':'both';
+  updateDimBadge();
+  if(S.slides.length) rerenderSlides();
+}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   STYLE SELECTION
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+function pickStyle(el,style){
+  document.querySelectorAll('.style-card').forEach(c=>c.classList.remove('active'));
+  el.classList.add('active');
+  S.style=style;
+  if(S.slides.length) rerenderSlides();
+}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   VIEW MODE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+function setViewMode(mode,btn){
+  document.querySelectorAll('.t-pill').forEach(p=>p.classList.remove('active'));
+  btn.classList.add('active');
+  S.viewMode=mode;
+  const c=document.getElementById('slidesContainer');
+  c.className='slides-container '+{grid3:'grid-3',grid2:'grid-2',single:'single'}[mode];
+  rescaleSlides();
+}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   COUNTER
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+function adjCount(d){
+  S.count=Math.min(7,Math.max(4,S.count+d));
+  document.getElementById('cntNum').textContent=S.count;
+}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   ZOOM
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+function zoomCanvas(d){
+  if(d===0) S.canvasZoom=1;
+  else S.canvasZoom=Math.min(2,Math.max(.3,S.canvasZoom+d));
+  document.getElementById('canvasScroll').style.zoom=S.canvasZoom;
+}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   GEMINI API
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+async function callGemini(key,topic,count){
+  const prompt=`أنت خبير محتوى متخصص في التصميم الجرافيكي والبراندينج.
+أنشئ محتوى كاروسيل من ${count} سلايدات باللغة العربية الفصحى حول: "${topic}".
+
+قواعد:
+- السلايد الأول: نوع "cover" — عنوان رئيسي جذاب + وصف تشويقي
+- السلايدات الوسطى: نوع "content" — عنوان فرعي + 3-4 نقاط عملية ومفيدة  
+- السلايد الأخير: نوع "cta" — خلاصة + دعوة للتفاعل أو المتابعة
+
+أعد JSON نظيف فقط بدون أي markdown أو نص خارجه:
+{
+  "slides": [
+    { "type": "cover", "title": "...", "desc": "..." },
+    { "type": "content", "title": "...", "points": ["...","...","..."] },
+    { "type": "cta", "title": "...", "desc": "..." }
+  ]
+}`;
+
+  const r=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${key}`,{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({
+      contents:[{parts:[{text:prompt}]}],
+      generationConfig:{temperature:.85,maxOutputTokens:4000}
+    })
+  });
+  if(!r.ok){const e=await r.json().catch(()=>({}));throw new Error(e?.error?.message||`HTTP ${r.status}`);}
+  const d=await r.json();
+  const raw=d?.candidates?.[0]?.content?.parts?.[0]?.text||'';
+  const clean=raw.replace(/```json|```/gi,'').trim();
+  return JSON.parse(clean).slides;
+}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   GENERATE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+async function generateCarousel(){
+  const key=document.getElementById('apiKey').value.trim();
+  const topic=document.getElementById('topic').value.trim();
+  if(!key){toast('أدخل مفتاح Gemini API','err');return;}
+  if(!topic){toast('أدخل موضوع الكاروسيل','err');return;}
+
+  setLoading(true);
+  setProgress(10);
+  setStatus('يتصل بـ Gemini AI...','busy');
+  showSkeletons(S.count);
+
+  try{
+    setProgress(35);
+    const slides=await callGemini(key,topic,S.count);
+    setProgress(70);
+    setStatus('يرسم السلايدات...','busy');
+    await new Promise(r=>setTimeout(r,300));
+    S.slides=slides;
+    renderSlides(slides);
+    setProgress(100);
+    setStatus(`✓ ${slides.length} سلايدات جاهزة`,'ok');
+    document.getElementById('dlBtn').disabled=false;
+    document.getElementById('btnDL').disabled=false;
+    toast(`تم توليد ${slides.length} سلايدات 🎉`,'ok');
+    setTimeout(()=>setProgress(0),1200);
+  }catch(e){
+    setProgress(0);
+    setStatus('خطأ: '+e.message,'err');
+    toast('فشل التوليد: '+e.message,'err',4000);
+    document.getElementById('slidesContainer').style.display='none';
+    document.getElementById('emptyState').style.display='flex';
+  }finally{
+    setLoading(false);
+  }
+}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   SKELETONS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+function showSkeletons(n){
+  const c=document.getElementById('slidesContainer');
+  const e=document.getElementById('emptyState');
+  e.style.display='none';
+  c.style.display='grid';
+  c.innerHTML='';
+  const {w,h}=S.mainSize;
+  const ratio=h/w;
+  for(let i=0;i<n;i++){
+    const f=document.createElement('div');
+    f.className='slide-frame skeleton';
+    f.style.paddingTop=(ratio*100)+'%';
+    c.appendChild(f);
+  }
+}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   RENDER SLIDES
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+function renderSlides(slides){
+  const c=document.getElementById('slidesContainer');
+  document.getElementById('emptyState').style.display='none';
+  c.style.display='grid';
+  c.innerHTML='';
+
+  const acct=document.getElementById('acctName').value||'@DesignStudio';
+  const tag =document.getElementById('acctTag').value||'#تصميم_جرافيك';
+  const total=slides.length;
+  const {w,h}=S.mainSize;
+
+  document.getElementById('slideCountInfo').textContent=`${total} سلايدات`;
+
+  slides.forEach((slide,idx)=>{
+    const frame=buildSlideFrame(slide,idx,total,acct,tag,w,h);
+    frame.addEventListener('click',()=>openModal(idx));
+    c.appendChild(frame);
+  });
+
+  requestAnimationFrame(rescaleSlides);
+}
+
+function rerenderSlides(){
+  if(S.slides.length) renderSlides(S.slides);
+}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   BUILD SLIDE FRAME
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+function buildSlideFrame(data,idx,total,acct,tag,w,h){
+  const frame=document.createElement('div');
+  frame.className='slide-frame';
+  frame.dataset.idx=idx;
+  frame.style.paddingTop=(h/w*100)+'%';
+
+  const inner=document.createElement('div');
+  inner.className='slide-frame-inner';
+  inner.id='slide-'+idx;
+  inner.innerHTML=buildSlideHTML(data,idx,total,acct,tag,w,h);
+  frame.appendChild(inner);
+
+  const badge=document.createElement('div');
+  badge.className='frame-num';
+  badge.textContent=`${idx+1} / ${total}`;
+  frame.appendChild(badge);
+
+  const actions=document.createElement('div');
+  actions.className='frame-actions';
+  actions.innerHTML=`
+    <button class="frame-action-btn" title="تعديل النص" onclick="event.stopPropagation();openEditModal(${idx})">✏️</button>
+    <button class="frame-action-btn" title="تغيير الأيقونة" onclick="event.stopPropagation();openIconPicker(${idx})">🙂</button>
+    <button class="frame-action-btn" title="صورة السلايد" onclick="event.stopPropagation();openImageModal(${idx})">🖼️</button>`;
+  frame.appendChild(actions);
+
+  return frame;
+}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   BUILD SLIDE HTML (core render engine)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+function buildSlideHTML(data,idx,total,acct,tag,w,h){
+  const sty=S.style;
+  const isCover=data.type==='cover'||idx===0;
+  const isCTA  =data.type==='cta'  ||idx===total-1;
+  const accent =ACCENTS[sty];
+
+  const fontFace=document.getElementById('fontSelect').value;
+  const titleSz=+document.getElementById('titleSz').value;
+  const bodySz=+document.getElementById('bodySz').value;
+  const pad=+document.getElementById('padSlider').value;
+  const showNum=document.getElementById('showNum').checked;
+  const showFooter=document.getElementById('showFooter').checked;
+  const showGrid=document.getElementById('showGrid').checked;
+  const isThumb=S.mainSize.isThumb;
+
+  // Scale factor for typography relative to 1080 width
+  const scale=w/1080;
+  const ts=Math.round(titleSz*scale);
+  const bs=Math.round(bodySz*scale);
+  const ps=Math.round(pad*scale);
+  const smallSz=Math.round(22*scale);
+  const numSz=Math.round(90*scale);
+  const chipSz=Math.round(20*scale);
+  const footerSz=Math.round(18*scale);
+  const numSubSz=Math.round(28*scale);
+  const lhManual=document.getElementById('lineHeightMode').checked;
+  const lhVal=parseFloat(document.getElementById('lineHeightSlider').value);
+  const pointsLH=lhManual?lhVal:1.6;
+  const descLH=lhManual?lhVal:1.7;
+
+  const num=String(idx+1).padStart(2,'0');
+  const totalStr=String(total).padStart(2,'0');
+  const isLast=idx===total-1;
+  const navLabel=isLast?'الختام':'التالي';
+  const navArrow=isLast?'★':'←';
+
+  // Icon badge — large, unified per-slide icon chosen via the emoji picker
+  const icon=data.icon!==undefined?data.icon:defaultIconFor(data,idx,total);
+  const iconBoxSz=Math.round((isCover?92:72)*scale);
+  const iconFontSz=Math.round((isCover?46*scale*1.05:38*scale));
+  const iconBadge=icon?`<div class="chip" style="width:${iconBoxSz}px;height:${iconBoxSz}px;border-radius:${Math.round(20*scale)}px;display:flex;align-items:center;justify-content:center;font-size:${iconFontSz}px;line-height:1;margin-bottom:${Math.round(20*scale)}px">${icon}</div>`:'';
+
+  // Points
+  let pointsHTML='';
+  if(data.points?.length){
+    const ptsHtml=data.points.map(p=>`
+      <li class="point-text" style="display:flex;align-items:flex-start;gap:${Math.round(16*scale)}px;font-size:${bs}px;font-weight:400;line-height:${pointsLH};margin-bottom:${Math.round(20*scale)}px">
+        <span class="accent-bg" style="width:${Math.round(12*scale)}px;height:${Math.round(12*scale)}px;border-radius:50%;flex-shrink:0;margin-top:${Math.round(8*scale)}px;display:block"></span>
+        <span>${p}</span>
+      </li>`).join('');
+    pointsHTML=`<ul style="list-style:none">${ptsHtml}</ul>`;
+  }
+  const descHTML=data.desc?`<p class="body-text" style="font-size:${bs}px;font-weight:400;line-height:${descLH};max-width:${Math.round(900*scale)}px;margin-top:${Math.round(10*scale)}px">${data.desc}</p>`:'';
+
+  // Cover layout vs content layout
+  let bodySection='';
+  if(isCover){
+    const coverTs=Math.round((titleSz*1.05)*scale);
+    bodySection=`
+    <div style="flex:1;display:flex;flex-direction:column;justify-content:center;padding:${ps}px ${ps}px 0;position:relative;z-index:2">
+      ${iconBadge}
+      <div class="chip" style="display:inline-flex;align-items:center;gap:${Math.round(8*scale)}px;font-size:${chipSz}px;font-weight:700;padding:${Math.round(8*scale)}px ${Math.round(20*scale)}px;border-radius:99px;margin-bottom:${Math.round(28*scale)}px;align-self:flex-start">
+        <span>كاروسيل</span>
+      </div>
+      <div class="accent-bg" style="width:${Math.round(70*scale)}px;height:${Math.round(5*scale)}px;border-radius:2px;margin-bottom:${Math.round(24*scale)}px"></div>
+      <h1 class="main-title" style="font-size:${coverTs}px;font-weight:900;line-height:1.08;letter-spacing:normal;margin-bottom:${Math.round(24*scale)}px;font-family:${fontFace}">${data.title}</h1>
+      ${descHTML}
+    </div>`;
+  } else {
+    const subTs=Math.round(titleSz*.9*scale);
+    bodySection=`
+    <div style="padding:${Math.round(20*scale)}px ${ps}px 0;position:relative;z-index:2;flex:1;overflow:hidden">
+      ${iconBadge}
+      <div class="accent-bg" style="width:${Math.round(60*scale)}px;height:${Math.round(4*scale)}px;border-radius:2px;margin-bottom:${Math.round(20*scale)}px"></div>
+      <h2 class="main-title" style="font-size:${subTs}px;font-weight:900;line-height:1.1;letter-spacing:normal;margin-bottom:${Math.round(24*scale)}px;font-family:${fontFace}">${data.title}</h2>
+      ${pointsHTML||descHTML}
+    </div>`;
+  }
+
+  // CTA overlay for last slide
+  const ctaOverlay=isCTA&&!isCover?`
+    <div style="position:absolute;bottom:${Math.round(100*scale)}px;left:${ps}px;right:${ps}px;z-index:3">
+      <div class="tag-box" style="display:inline-flex;align-items:center;gap:${Math.round(10*scale)}px;padding:${Math.round(10*scale)}px ${Math.round(20*scale)}px;border-radius:${Math.round(8*scale)}px;font-size:${Math.round(18*scale)}px;font-weight:600">
+        <span style="font-size:${Math.round(20*scale)}px">💬</span>
+        <span class="body-text">شارك رأيك في التعليقات</span>
+      </div>
+    </div>`:'';
+
+  // Number section
+  const numSection=showNum?`
+    <div class="num-ghost" style="text-align:center;font-size:${numSz}px;font-weight:900;letter-spacing:${Math.round(-4*scale)}px;line-height:1;padding:${Math.round(16*scale)}px 0 0;position:relative;z-index:2;user-select:none">
+      <span class="num-accent">${num}</span>
+      <span style="font-size:${numSubSz}px;font-weight:400;opacity:.6"> / ${totalStr}</span>
+    </div>`:'';
+
+  // Slide image (bottom-center) — uploaded photo, flat icon, or pasted URL
+  let imageSection='';
+  if(data.image && data.image.type){
+    const img=data.image;
+    const boxW=Math.round(w*0.42);
+    const boxH=Math.round(h*0.24);
+    let inner='';
+    if(img.type==='flat'){
+      const ic=FLAT_ICON_LIB.find(f=>f.key===img.key);
+      if(ic){
+        const sz=Math.round(120*scale);
+        inner=`<div style="width:${sz}px;height:${sz}px;filter:drop-shadow(0 ${Math.round(10*scale)}px ${Math.round(22*scale)}px rgba(0,0,0,.3))">${flatIconSVG(ic)}</div>`;
+      }
+    } else if(img.type==='upload'||img.type==='url'){
+      if(img.framed){
+        const pad=Math.round(8*scale);
+        inner=`<div style="width:${boxW}px;height:${boxH}px;box-sizing:border-box;background:#fff;padding:${pad}px;border-radius:${Math.round(14*scale)}px;box-shadow:0 ${Math.round(10*scale)}px ${Math.round(28*scale)}px rgba(0,0,0,.28);display:flex;align-items:center;justify-content:center">
+          <img src="${img.src}" style="max-width:100%;max-height:100%;width:auto;height:auto;object-fit:contain;border-radius:${Math.round(8*scale)}px;display:block">
+        </div>`;
+      } else {
+        inner=`<div style="width:${boxW}px;height:${boxH}px;display:flex;align-items:center;justify-content:center">
+          <img src="${img.src}" style="max-width:100%;max-height:100%;width:auto;height:auto;object-fit:contain;filter:drop-shadow(0 ${Math.round(10*scale)}px ${Math.round(24*scale)}px rgba(0,0,0,.3))">
+        </div>`;
+      }
+    }
+    if(inner){
+      const bottomBase=showFooter?Math.round(118*scale):Math.round(36*scale);
+      const bottomExtra=(isCTA&&!isCover)?Math.round(86*scale):0;
+      imageSection=`<div style="position:absolute;left:50%;transform:translateX(-50%);bottom:${bottomBase+bottomExtra}px;z-index:3;display:flex;justify-content:center;align-items:flex-end">${inner}</div>`;
+    }
+  }
+
+  // Footer
+  const footerSection=showFooter?`
+    <div style="position:absolute;bottom:0;left:0;right:0;z-index:4;padding:0 ${ps}px ${Math.round(36*scale)}px;display:flex;align-items:center;justify-content:space-between">
+      <span class="footer-muted" style="font-size:${footerSz}px;font-weight:300">Carousel Studio © 2025</span>
+      <div class="capsule" style="display:flex;align-items:center;gap:${Math.round(10*scale)}px;padding:${Math.round(10*scale)}px ${Math.round(22*scale)}px;border-radius:99px">
+        <span style="font-size:${footerSz}px;font-weight:700">${navLabel}</span>
+        <span class="nav-arrow" style="font-size:${Math.round(22*scale)}px;font-weight:900">${navArrow}</span>
+      </div>
+    </div>`:'';
+
+  // Grid background (can be disabled)
+  const bgClass=showGrid?'bg':'';
+
+  return `
+  <div class="SLIDE s-${sty}" style="width:${w}px;height:${h}px;font-family:${fontFace}">
+    <div class="${bgClass}"></div>
+    <!-- HEADER -->
+    <div style="position:relative;z-index:2;display:flex;align-items:center;justify-content:space-between;padding:${Math.round(34*scale)}px ${ps}px 0">
+      <span class="hdr-text" style="font-size:${smallSz}px;font-weight:500;letter-spacing:.5px">${acct}</span>
+      <div style="display:flex;align-items:center;gap:${Math.round(12*scale)}px">
+        <span class="hdr-text" style="font-size:${smallSz}px;font-weight:300">${tag}</span>
+        <div class="accent-bg" style="width:${Math.round(8*scale)}px;height:${Math.round(8*scale)}px;border-radius:50%"></div>
+      </div>
+    </div>
+    ${numSection}
+    ${bodySection}
+    ${ctaOverlay}
+    ${imageSection}
+    ${footerSection}
+  </div>`;
+}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   RESCALE SLIDES
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+function rescaleSlides(){
+  const frames=document.querySelectorAll('.slide-frame');
+  frames.forEach(frame=>{
+    const inner=frame.querySelector('.slide-frame-inner');
+    if(!inner) return;
+    const fw=frame.offsetWidth;
+    const slide=inner.querySelector('.SLIDE');
+    if(!slide) return;
+    const sw=+slide.style.width.replace('px','');
+    if(sw>0) inner.style.transform=`scale(${fw/sw})`;
+  });
+}
+window.addEventListener('resize',rescaleSlides);
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   MODAL
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+function openModal(idx){
+  S.modalIdx=idx;
+  showModalSlide(idx);
+  document.getElementById('modal').classList.add('open');
+}
+function showModalSlide(idx){
+  const acct=document.getElementById('acctName').value||'@DesignStudio';
+  const tag =document.getElementById('acctTag').value||'#تصميم_جرافيك';
+  const {w,h}=S.mainSize;
+  const maxW=window.innerWidth*.88, maxH=window.innerHeight*.88;
+  const scale=Math.min(maxW/w, maxH/h);
+  const slide=S.slides[idx];
+  if(!slide) return;
+  const html=buildSlideHTML(slide,idx,S.slides.length,acct,tag,w,h);
+  const mf=document.getElementById('modalFrame');
+  mf.style.width=(w*scale)+'px';
+  mf.style.height=(h*scale)+'px';
+  mf.innerHTML=`<div style="transform:scale(${scale});transform-origin:top left;width:${w}px;height:${h}px">${html}</div>`;
+}
+function modalNav(d){
+  S.modalIdx=Math.min(S.slides.length-1, Math.max(0, S.modalIdx+d));
+  showModalSlide(S.modalIdx);
+}
+function closeModal(){document.getElementById('modal').classList.remove('open')}
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape') closeModal();
+  if(e.key==='ArrowRight'&&document.getElementById('modal').classList.contains('open')) modalNav(-1);
+  if(e.key==='ArrowLeft' &&document.getElementById('modal').classList.contains('open')) modalNav(+1);
+});
+document.getElementById('modal').addEventListener('click',e=>{
+  if(e.target===document.getElementById('modal')) closeModal();
+});
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   EDIT SLIDE TEXT
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+function openEditModal(idx){
+  const slide=S.slides[idx];
+  if(!slide) return;
+  S.editTargetIdx=idx;
+  document.getElementById('editTitle').value=slide.title||'';
+  document.getElementById('editDesc').value=slide.desc||'';
+  document.getElementById('editPoints').value=(slide.points||[]).join('\n');
+  const isContent=!(slide.type==='cover'||idx===0)&&!(slide.type==='cta'||idx===S.slides.length-1);
+  document.getElementById('editDescWrap').style.display=isContent?'none':'flex';
+  document.getElementById('editPointsWrap').style.display=isContent?'flex':'none';
+  document.getElementById('editModal').classList.add('open');
+}
+function closeEditModal(){document.getElementById('editModal').classList.remove('open')}
+function saveEditModal(){
+  const idx=S.editTargetIdx;
+  const slide=S.slides[idx];
+  if(!slide) return;
+  const newTitle=document.getElementById('editTitle').value.trim();
+  const newDesc=document.getElementById('editDesc').value.trim();
+  const newPoints=document.getElementById('editPoints').value.split('\n').map(s=>s.trim()).filter(Boolean);
+  if(newTitle) slide.title=newTitle;
+  if(document.getElementById('editDescWrap').style.display!=='none') slide.desc=newDesc;
+  if(document.getElementById('editPointsWrap').style.display!=='none' && newPoints.length) slide.points=newPoints;
+  closeEditModal();
+  rerenderSlides();
+  toast('تم حفظ التعديلات ✓','ok');
+}
+document.getElementById('editModal').addEventListener('click',e=>{
+  if(e.target===document.getElementById('editModal')) closeEditModal();
+});
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   ICON PICKER
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+function openIconPicker(idx){
+  if(!S.slides[idx]) return;
+  S.iconTargetIdx=idx;
+  const wrap=document.getElementById('iconGroups');
+  wrap.innerHTML=Object.entries(ICON_SETS).map(([cat,icons])=>`
+    <div class="icon-group">
+      <div class="icon-group-title">${cat}</div>
+      <div class="icon-grid">
+        ${icons.map(ic=>`<button class="icon-opt" type="button" onclick="selectIcon('${ic}')">${ic}</button>`).join('')}
+      </div>
+    </div>`).join('');
+  document.getElementById('iconModal').classList.add('open');
+}
+function closeIconPicker(){document.getElementById('iconModal').classList.remove('open')}
+function selectIcon(ic){
+  const idx=S.iconTargetIdx;
+  if(idx==null||!S.slides[idx]) return;
+  S.slides[idx].icon=ic;
+  closeIconPicker();
+  rerenderSlides();
+  toast('تم تغيير الأيقونة ✓','ok');
+}
+document.getElementById('iconModal').addEventListener('click',e=>{
+  if(e.target===document.getElementById('iconModal')) closeIconPicker();
+});
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   SLIDE IMAGE (upload / flat icon / url)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+function openImageModal(idx){
+  if(!S.slides[idx]) return;
+  S.imageTargetIdx=idx;
+  document.getElementById('flatIconGrid').innerHTML=FLAT_ICON_LIB.map(ic=>
+    `<button class="icon-opt flat-icon-opt" type="button" title="${ic.label}" onclick="selectFlatIcon('${ic.key}')">${flatIconSVG(ic)}</button>`
+  ).join('');
+  document.querySelectorAll('.img-tab').forEach(b=>b.classList.remove('active'));
+  document.querySelector('.img-tab[data-tab="upload"]').classList.add('active');
+  document.querySelectorAll('.img-tab-panel').forEach(p=>p.style.display='none');
+  document.getElementById('tab-upload').style.display='block';
+  document.getElementById('imgUploadPreview').innerHTML='';
+  document.getElementById('imgUploadInput').value='';
+  document.getElementById('imgUrlInput').value='';
+  document.getElementById('imageModal').classList.add('open');
+}
+function closeImageModal(){document.getElementById('imageModal').classList.remove('open')}
+function switchImgTab(tab,btn){
+  document.querySelectorAll('.img-tab').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.img-tab-panel').forEach(p=>p.style.display='none');
+  document.getElementById('tab-'+tab).style.display='block';
+}
+function handleImageUpload(e){
+  const file=e.target.files[0];
+  if(!file) return;
+  const idx=S.imageTargetIdx;
+  if(idx==null||!S.slides[idx]) return;
+  const reader=new FileReader();
+  reader.onload=()=>{
+    const framed=document.getElementById('imgUploadFramed').checked;
+    S.slides[idx].image={type:'upload',src:reader.result,framed};
+    document.getElementById('imgUploadPreview').innerHTML=`<img src="${reader.result}" style="max-width:100%;max-height:120px;border-radius:8px;margin-top:8px">`;
+    rerenderSlides();
+    toast('تمت إضافة الصورة ✓','ok');
+  };
+  reader.readAsDataURL(file);
+}
+function selectFlatIcon(key){
+  const idx=S.imageTargetIdx;
+  if(idx==null||!S.slides[idx]) return;
+  S.slides[idx].image={type:'flat',key};
+  closeImageModal();
+  rerenderSlides();
+  toast('تمت إضافة الأيقونة ✓','ok');
+}
+function applyImageUrl(){
+  const idx=S.imageTargetIdx;
+  if(idx==null||!S.slides[idx]) return;
+  const url=document.getElementById('imgUrlInput').value.trim();
+  if(!url){toast('أدخل رابط صورة صالح','err');return;}
+  const framed=document.getElementById('imgUrlFramed').checked;
+  S.slides[idx].image={type:'url',src:url,framed};
+  rerenderSlides();
+  toast('تم تطبيق الرابط — تحقق من المعاينة بالأسفل','ok');
+}
+function removeSlideImage(){
+  const idx=S.imageTargetIdx;
+  if(idx==null||!S.slides[idx]) return;
+  delete S.slides[idx].image;
+  closeImageModal();
+  rerenderSlides();
+  toast('تمت إزالة الصورة','ok');
+}
+document.getElementById('imageModal').addEventListener('click',e=>{
+  if(e.target===document.getElementById('imageModal')) closeImageModal();
+});
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   DOWNLOAD ALL
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+async function downloadAll(){
+  if(!S.slides.length){toast('لا يوجد كاروسيل للتحميل','err');return;}
+  const dlBtn=document.getElementById('dlBtn');
+  dlBtn.disabled=true;
+  const total=S.slides.length;
+  const acct=document.getElementById('acctName').value||'@DesignStudio';
+  const tag =document.getElementById('acctTag').value||'#تصميم_جرافيك';
+  const {w,h}=S.mainSize;
+
+  // Determine which sizes to export
+  let exportSizes=[{w,h,suffix:''}];
+  const thumbOn=document.getElementById('thumb-on').checked;
+  if(thumbOn){
+    if(S.thumbMode==='v'||S.thumbMode==='both')
+      exportSizes.push({w:1080,h:1920,suffix:'_thumb_9x16'});
+    if(S.thumbMode==='h'||S.thumbMode==='both')
+      exportSizes.push({w:1920,h:1080,suffix:'_thumb_16x9'});
+  }
+
+  for(const sz of exportSizes){
+    for(let i=0;i<total;i++){
+      const pct=Math.round(((exportSizes.indexOf(sz)*total+i+1)/(exportSizes.length*total))*100);
+      setProgress(pct);
+      setStatus(`يصدّر ${i+1}/${total}${sz.suffix?` (${sz.suffix})`:''}...`,'busy');
+
+      const tmpEl=document.createElement('div');
+      tmpEl.style.cssText='position:fixed;top:-99999px;left:-99999px;z-index:-1';
+      tmpEl.innerHTML=buildSlideHTML(S.slides[i],i,total,acct,tag,sz.w,sz.h);
+      document.body.appendChild(tmpEl);
+      const slideEl=tmpEl.querySelector('.SLIDE');
+
+      try{
+        await document.fonts.ready;
+        const imgs=slideEl.querySelectorAll('img');
+        await Promise.all([...imgs].map(im=>im.complete?Promise.resolve():new Promise(res=>{im.onload=im.onerror=res;})));
+        const canvas=await html2canvas(slideEl,{
+          scale:1,width:sz.w,height:sz.h,
+          useCORS:true,allowTaint:true,
+          backgroundColor:null,logging:false
+        });
+        const a=document.createElement('a');
+        a.download=`carousel-${String(i+1).padStart(2,'0')}${sz.suffix}.png`;
+        a.href=canvas.toDataURL('image/png',1.0);
+        a.click();
+        await new Promise(r=>setTimeout(r,300));
+      }catch(err){console.warn('Export error',i,err);}
+      finally{tmpEl.remove();}
+    }
+  }
+
+  setProgress(0);
+  setStatus(`✓ تم التحميل`,'ok');
+  dlBtn.disabled=false;
+  toast(`تم تحميل ${total*exportSizes.length} صورة 📥`,'ok');
+}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   DOWNLOAD THIS HTML (GitHub ready)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+function downloadHTML(){
+  const blob=new Blob([document.documentElement.outerHTML],{type:'text/html'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download='index.html';
+  a.click();
+  toast('تم تحميل index.html ✓','ok');
+}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   DEMO DATA
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+function loadDemo(){
+  S.slides=[
+    {type:'cover', title:'أخطاء قاتلة في تصميم الشعارات',
+     desc:'5 أخطاء يقع فيها كل مصمم مبتدئ — وكيف تتجنبها من اليوم'},
+    {type:'content', title:'الخطأ الأول: التعقيد الزائد',
+     points:['الشعار الجيد يبقى مقروءاً بحجم 16 بكسل','التفاصيل الكثيرة تضيع عند التصغير','قاعدة: إذا احتجت للتوضيح فالشعار فاشل']},
+    {type:'content', title:'الخطأ الثاني: الخط الخاطئ',
+     points:['الخط يعكس شخصية العلامة التجارية بالكامل','لا تستخدم أكثر من خطين في الشعار','الخطوط المجانية الشهيرة = فقدان التميز']},
+    {type:'content', title:'الخطأ الثالث: تجاهل الأبيض والأسود',
+     points:['اختبر الشعار بالأبيض والأسود أولاً','الشعار القوي لا يحتاج لون ليُفهم','الألوان تُضاف في المرحلة الأخيرة فقط']},
+    {type:'cta', title:'احفظ هذه النقاط واستخدمها 📌',
+     desc:'طبّق هذه القواعد في مشاريعك القادمة. ما أكثر خطأ تقع فيه؟ شاركنا في التعليقات!'}
+  ];
+  S.count=S.slides.length;
+  document.getElementById('cntNum').textContent=S.count;
+  renderSlides(S.slides);
+  document.getElementById('dlBtn').disabled=false;
+  document.getElementById('btnDL').disabled=false;
+  setStatus('✓ كاروسيل تجريبي محمّل','ok');
+  toast('تم تحميل الكاروسيل التجريبي ✦','info');
+}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   INIT
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+updateDimBadge();
+
+// Draw size visual boxes
+document.querySelectorAll('.size-card').forEach(card=>{
+  const w=+card.dataset.w, h=+card.dataset.h;
+  const vis=card.querySelector('.size-visual');
+  if(!vis) return;
+  const maxDim=26;
+  const ratio=h/w;
+  if(ratio>=1){
+    vis.style.width=maxDim+'px';
+    vis.style.height=Math.round(maxDim*ratio)+'px';
+  } else {
+    vis.style.height=maxDim+'px';
+    vis.style.width=Math.round(maxDim/ratio)+'px';
+  }
+  vis.style.border='1.5px solid #555';
+  vis.style.borderRadius='2px';
+  vis.style.background='none';
+});
+
+// Load demo on start
+window.addEventListener('load', () => setTimeout(loadDemo, 500));
+</script>
+</body>
+</html>
